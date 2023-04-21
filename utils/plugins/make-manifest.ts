@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import colorLog from "../log";
 import { PluginOption } from "vite";
+import colorLog from "../log";
 import ManifestParser from "../manifest-parser";
 
 const { resolve } = path;
@@ -20,11 +20,13 @@ export default function makeManifest(
     const manifestPath = resolve(to, "manifest.json");
 
     // Naming change for cache invalidation
-    if (config.contentScriptCssKey) {
+    if (manifest.content_scripts && config.contentScriptCssKey) {
       manifest.content_scripts.forEach((script) => {
-        script.css = script.css.map((css) =>
-          css.replace("<KEY>", config.contentScriptCssKey)
-        );
+        if (script.css) {
+          script.css = script.css.map((css) =>
+            css.replace("<KEY>", config.contentScriptCssKey)
+          );
+        }
       });
     }
 

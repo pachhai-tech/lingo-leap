@@ -35,3 +35,9 @@ declare module "*.json" {
   const content: string;
   export default content;
 }
+
+declare global {
+  interface Window {
+    __contentScriptInjected: boolean;
+  }
+}

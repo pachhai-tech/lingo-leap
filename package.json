@@ -1,6 +1,6 @@
 {
-  "name": "ling-leap",
-  "version": "0.0.1",
+  "name": "lingo-leap",
+  "version": "1.0.0",
   "description": "Effortlessly bridge language barriers with a single click, unlocking the world's content at your fingertips",
   "license": "MIT",
   "repository": {
@@ -17,6 +17,8 @@
   },
   "type": "module",
   "dependencies": {
+    "esm": "^3.2.25",
+    "franc": "^6.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
@@ -24,6 +26,7 @@
     "@rollup/plugin-typescript": "^8.5.0",
     "@testing-library/react": "13.4.0",
     "@types/chrome": "0.0.231",
+    "@types/franc": "^5.0.1",
     "@types/jest": "29.5.0",
     "@types/node": "18.15.11",
     "@types/react": "18.0.21",

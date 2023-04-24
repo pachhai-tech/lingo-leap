@@ -27,7 +27,7 @@
     "@testing-library/react": "13.4.0",
     "@types/chrome": "0.0.231",
     "@types/franc": "^5.0.1",
-    "@types/jest": "29.5.0",
+    "@types/jest": "29.5.1",
     "@types/node": "18.15.11",
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.11",

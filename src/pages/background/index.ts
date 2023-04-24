@@ -19,15 +19,70 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-chrome.contextMenus.create({
-  id: "translate",
-  title: "Translate",
-  contexts: ["selection"],
+function createContextMenuItem(options) {
+  chrome.contextMenus.create(options, () => {
+    if (chrome.runtime.lastError) {
+      console.error(chrome.runtime.lastError);
+    }
+  });
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  createContextMenuItem({
+    id: "translate",
+    title: "Translate",
+    contexts: ["selection"],
+  });
+
+  createContextMenuItem({
+    id: "translateToNepali",
+    parentId: "translate",
+    title: "Translate to Nepali",
+    contexts: ["selection"],
+  });
+
+  createContextMenuItem({
+    id: "translateToEnglish",
+    parentId: "translate",
+    title: "Translate to English",
+    contexts: ["selection"],
+  });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "translate") {
-    chrome.tabs.sendMessage(tab.id, { action: "translateSelection" });
+  console.log("Context menu item clicked:", info.menuItemId);
+
+  let targetLanguage;
+
+  if (info.menuItemId === "translateToNepali") {
+    targetLanguage = "ne";
+  } else if (info.menuItemId === "translateToEnglish") {
+    targetLanguage = "en";
+  }
+
+  if (targetLanguage) {
+    console.log("Sending message to content script:", {
+      action: "translate",
+      targetLanguage,
+    });
+    chrome.tabs.sendMessage(
+      tab.id,
+      { action: "translate", targetLanguage },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError);
+          return;
+        }
+
+        console.log("Received response from content script:", response);
+
+        if (!response.success) {
+          console.error("Error during translation:", response.error);
+        } else {
+          console.log("Translation successful");
+        }
+      }
+    );
   }
 });
 

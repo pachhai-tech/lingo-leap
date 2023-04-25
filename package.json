@@ -19,16 +19,17 @@
   "dependencies": {
     "esm": "^3.2.25",
     "franc": "^6.1.0",
+    "langs": "^2.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.5.0",
-    "@testing-library/react": "13.4.0",
-    "@types/chrome": "0.0.231",
+    "@testing-library/react": "14.0.0",
+    "@types/chrome": "0.0.233",
     "@types/franc": "^5.0.1",
     "@types/jest": "29.5.1",
-    "@types/node": "18.15.11",
+    "@types/node": "18.16.0",
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.11",
     "@types/ws": "^8.5.3",

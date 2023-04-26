@@ -94,7 +94,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   let operation;
   let targetLanguage;
 
-  const menuItemId = info.menuItemId as string; // Add this line
+  const menuItemId = info.menuItemId as string;
 
   if (menuItemId.startsWith("translate")) {
     operation = "translate";
@@ -115,21 +115,26 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       action: operation,
       targetLanguage,
     });
+
     chrome.tabs.sendMessage(
       tab.id,
-      { action: operation, targetLanguage },
-      (response) => {
+      { message: "execute_content_script" },
+      () => {
         if (chrome.runtime.lastError) {
-          console.error(chrome.runtime.lastError);
-          return;
-        }
-
-        console.log("Received response from content script:", response);
-
-        if (!response.success) {
-          console.error("Error during operation:", response.error);
+          console.error(chrome.runtime.lastError.message);
         } else {
-          console.log("Operation successful");
+          chrome.tabs.sendMessage(
+            tab.id,
+            {
+              action: operation,
+              targetLanguage: targetLanguage,
+            },
+            (response) => {
+              if (!response.success) {
+                console.error("Error during operation:", response.error);
+              }
+            }
+          );
         }
       }
     );

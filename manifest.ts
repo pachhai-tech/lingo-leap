@@ -21,7 +21,7 @@ const manifest: chrome.runtime.ManifestV3 = {
   action: {
     default_icon: "icon-34.png",
     default_title: "Lingo Leap",
-    // default_popup: "src/pages/popup/index.html",
+    default_popup: "src/pages/popup/index.html",
   },
   options_page: "src/pages/options/index.html",
   chrome_url_overrides: {

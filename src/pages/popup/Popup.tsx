@@ -1,95 +1,60 @@
 import "@pages/popup/Popup.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Popup = () => {
-  const [targetLanguage, setTargetLanguage] = useState("en");
+  const [apiKey, setApiKey] = useState("");
 
-  const handleTranslate = async (action) => {
+  useEffect(() => {
+    chrome.storage.local.get("openai_api_key", (data) => {
+      if (data.openai_api_key) {
+        setApiKey(data.openai_api_key);
+      }
+    });
+  }, []);
+
+  // Add this function to send the message when the API key is saved
+  const executeContentScript = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (!tabs || !tabs.length) {
-        console.error("Failed to get active tab");
-        return;
-      }
-      const tab = tabs[0];
-      if (
-        tab.url &&
-        (tab.url.startsWith("chrome://") ||
-          tab.url.startsWith("chrome-extension://"))
-      ) {
-        console.error(
-          "Cannot inject content script into restricted URL:",
-          tab.url
-        );
-        return;
-      }
-
-      const injectContentScript = () => {
-        return new Promise<void>((resolve, reject) => {
-          chrome.scripting.executeScript(
-            {
-              target: { tabId: tab.id },
-              files: ["content.js"],
-            },
-            () => {
-              if (chrome.runtime.lastError) {
-                reject(chrome.runtime.lastError);
-              } else {
-                resolve();
-              }
-            }
-          );
-        });
-      };
-
-      const sendMessageToContentScript = () => {
-        const message = {
-          action: action,
-          targetLanguage: targetLanguage,
-        };
-        return new Promise((resolve, reject) => {
-          chrome.tabs.sendMessage(tab.id, message, (response) => {
-            if (chrome.runtime.lastError) {
-              reject(chrome.runtime.lastError);
-            } else {
-              resolve(response);
-            }
-          });
-        });
-      };
-
-      injectContentScript()
-        .then(sendMessageToContentScript)
-        .catch((error) => {
-          console.error("Error:", error);
-        });
+      chrome.tabs.sendMessage(tabs[0].id, {
+        message: "execute_content_script",
+      });
+      chrome.tabs.sendMessage(tabs[0].id, {
+        message: "update_api_key",
+        apiKey: apiKey,
+      });
     });
   };
 
-  const handleTranslateSelectedText = async () => {
-    handleTranslate("translateSelection");
+  // Update the saveApiKey function to call executeContentScript
+  const saveApiKey = () => {
+    chrome.storage.local.set({ openai_api_key: apiKey }, () => {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError);
+      } else {
+        console.log("API key saved");
+        executeContentScript();
+      }
+    });
   };
 
-  const handleTranslatePage = async () => {
-    handleTranslate("translatePage");
+  const handleChange = (e) => {
+    setApiKey(e.target.value);
   };
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>Lingo Leap</h1>
-        <p>Select your target language:</p>
-        <select
-          value={targetLanguage}
-          onChange={(e) => setTargetLanguage(e.target.value)}
-        >
-          <option value="English">English</option>
-          <option value="Nepali">Nepali</option>
-          {/* Add more language options here */}
-        </select>
-        <button onClick={handleTranslatePage}>Translate Page</button>
-        <button onClick={handleTranslateSelectedText}>
-          Translate Selected Text
-        </button>
+        <div>
+          <label htmlFor="api-key-input">OpenAI API Key:</label>
+          <input
+            type="text"
+            id="api-key-input"
+            value={apiKey}
+            onChange={handleChange}
+          />
+        </div>
+        <button onClick={saveApiKey}>Save API Key</button>
       </header>
     </div>
   );
